@@ -1,0 +1,219 @@
+﻿@model Estrrado_SchoolManagementSystem.Models.RegistrationModel
+
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Student Registration</h4>
+        </div>
+
+        <div class="card-body">
+            <form id="registerForm" asp-action="Register" method="post" novalidate>
+
+                <!-- BASIC DETAILS -->
+                <h5 class="text-secondary mb-3">Basic Details</h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" type="password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Class" class="form-label"></label>
+                        <input asp-for="Class" type="number" min="1" max="12" class="form-control" />
+                        <span asp-validation-for="Class" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="DateOfBirth" class="form-label"></label>
+                        <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Address" class="form-label"></label>
+                    <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <!-- QUALIFICATIONS -->
+                <h5 class="text-secondary mb-3">Qualification Details</h5>
+
+                <div id="qualificationContainer">
+                    <div class="row g-2 qualification-row mb-2">
+                        <div class="col-md-3">
+                            <input name="Qualifications[0].Course" class="form-control qualification-field" placeholder="Course" />
+                        </div>
+                        <div class="col-md-3">
+                            <input name="Qualifications[0].University" class="form-control qualification-field" placeholder="University" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="Qualifications[0].Year" type="number" class="form-control qualification-field" placeholder="Year" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="Qualifications[0].Percentage" type="number" step="0.01" class="form-control qualification-field" placeholder="%" />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm removeQualification">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="addQualification" class="btn btn-outline-secondary btn-sm mb-3">
+                    + Add Qualification
+                </button>
+
+                <hr />
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success px-4">
+                        Register
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+                $(document).ready(function () {
+
+            let qualificationIndex = 1;
+
+            // Add new qualification row
+            $("#addQualification").click(function () {
+                $("#qualificationContainer").append(`
+                    <div class="row g-2 qualification-row mb-2">
+                        <div class="col-md-3">
+                            <input name="Qualifications[${qualificationIndex}].Course" class="form-control qualification-field" placeholder="Course" />
+                        </div>
+                        <div class="col-md-3">
+                            <input name="Qualifications[${qualificationIndex}].University" class="form-control qualification-field" placeholder="University" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="Qualifications[${qualificationIndex}].Year" type="number" class="form-control qualification-field" placeholder="Year" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="Qualifications[${qualificationIndex}].Percentage" type="number" step="0.01" class="form-control qualification-field" placeholder="%" />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm removeQualification">Remove</button>
+                        </div>
+                    </div>
+                `);
+                qualificationIndex++;
+            });
+
+            // Remove qualification row
+            $("#qualificationContainer").on("click", ".removeQualification", function () {
+                $(this).closest(".qualification-row").remove();
+            });
+
+            // Initialize jQuery Validation
+            const validator = $("#registerForm").validate({
+                rules: {
+                    FullName: { required: true, maxlength: 100 },
+                    Email: { required: true, email: true },
+                    Password: { required: true, minlength: 6 },
+                    ConfirmPassword: { required: true, equalTo: "[name='Password']" },
+                    Phone: { required: true, digits: true },
+                    Class: { required: true, min: 1, max: 12 },
+                    DateOfBirth: { required: true },
+                    Address: { required: true }
+                },
+                messages: {
+                    FullName: "Full Name is required",
+                    Email: "Valid Email is required",
+                    Password: "Password must be at least 6 characters",
+                    ConfirmPassword: "Passwords must match",
+                    Phone: "Valid phone number required",
+                    Class: "Class must be between 1 and 12",
+                    DateOfBirth: "DOB is required",
+                    Address: "Address is required"
+                },
+                errorClass: "text-danger",
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element);
+                },
+                onkeyup: function(element) {
+                    $(element).valid();
+                },
+                onfocusout: function(element) {
+                    $(element).valid();
+                },
+                onchange: function(element) {
+                    $(element).valid();
+                },
+                submitHandler: function (form) {
+                    let valid = true;
+                    $(".qualification-row").each(function () {
+                        $(this).find(".qualification-field").each(function () {
+                            if (!$(this).val()) {
+                                $(this).addClass("is-invalid");
+                                valid = false;
+                            } else {
+                                $(this).removeClass("is-invalid");
+                            }
+                        });
+                    });
+
+                    if (!valid) {
+                        alert("Please fill all qualification fields.");
+                        return false;
+                    }
+
+                    form.submit();
+                }
+            });
+
+            // Real-time confirm password check
+            $("[name='ConfirmPassword']").on("keyup", function () {
+                $(this).valid(); // triggers validation immediately
+            });
+
+            // Real-time check for qualification fields
+            $(document).on("input", ".qualification-field", function () {
+                if ($(this).val()) {
+                    $(this).removeClass("is-invalid");
+                } else {
+                    $(this).addClass("is-invalid");
+                }
+            });
+
+        });
+
+    </script>
+}
